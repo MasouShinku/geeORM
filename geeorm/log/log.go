@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	preError = "\\033[31m[Error]\\033[0m"
-	preInfo  = "\\033[34m[Info]\\033[0m"
+	preError = "\033[31m[Error]\033[0m"
+	preInfo  = "\033[34m[Info]\033[0m"
 )
 
 // 设置日志的层级
