@@ -1,4 +1,4 @@
-module geeORM
+module geeorm
 
 go 1.22
 
