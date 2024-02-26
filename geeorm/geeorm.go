@@ -1,11 +1,11 @@
 // Engine模块
 // 交互前的准备工作以及交互后的收尾工作
-package geeORM
+package geeorm
 
 import (
 	"database/sql"
-	"geeORM/log"
-	"geeORM/session"
+	"geeorm/log"
+	"geeorm/session"
 )
 
 // Engine 结构体定义
