@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"geeORM"
+	"geeorm"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
-	engine, _ := geeORM.NewEngine("sqlite3", "gee.db")
+	engine, _ := geeorm.NewEngine("sqlite3", "gee.db")
 	defer engine.Close()
 	s := engine.NewSession()
 	_, _ = s.Raw("DROP TABLE IF EXISTS User;").Exec()
