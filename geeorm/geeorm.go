@@ -4,13 +4,15 @@ package geeorm
 
 import (
 	"database/sql"
+	"geeorm/dialect"
 	"geeorm/log"
 	"geeorm/session"
 )
 
 // Engine 结构体定义
 type Engine struct {
-	db *sql.DB
+	db      *sql.DB
+	dialect dialect.Dialect
 }
 
 // NewEngine 创建实例方法
@@ -24,7 +26,13 @@ func NewEngine(driver, source string) (e *Engine, err error) {
 		log.Errorln(err)
 		return
 	}
-	e = &Engine{db: db}
+
+	dial, ok := dialect.GetDialect(driver)
+	if !ok {
+		log.Errorln("dialect %s 不存在!", driver)
+		return
+	}
+	e = &Engine{db: db, dialect: dial}
 	log.Infoln("数据库连接成功!")
 	return
 }
@@ -39,5 +47,5 @@ func (e *Engine) Close() {
 
 // NewSession 创建会话
 func (e *Engine) NewSession() *session.Session {
-	return session.New(e.db)
+	return session.New(e.db, e.dialect)
 }
