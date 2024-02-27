@@ -6,21 +6,26 @@ package session
 
 import (
 	"database/sql"
+	"geeorm/dialect"
 	"geeorm/log"
+	"geeorm/schema"
 	"strings"
 )
 
 // Session 会话结构体
 type Session struct {
-	db      *sql.DB         //数据库指针
-	sql     strings.Builder // 用于拼接sql语句
-	sqlVars []interface{}   // 用于存储拼接sql语句时的占位符
+	db       *sql.DB         //数据库指针
+	sql      strings.Builder // 用于存放待执行的sql语句
+	sqlVars  []interface{}   // 用于存储拼接sql语句时的占位符
+	dialect  dialect.Dialect // 存放数据库方言
+	refTable *schema.Schema  // 数据库模式
 }
 
 // New 创建会话对象
-func New(db *sql.DB) *Session {
+func New(db *sql.DB, dialect dialect.Dialect) *Session {
 	return &Session{
-		db: db,
+		db:      db,
+		dialect: dialect,
 	}
 }
 
