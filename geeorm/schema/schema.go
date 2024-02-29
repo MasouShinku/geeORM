@@ -15,12 +15,11 @@ type Field struct {
 }
 
 // Schema 数据库表格对象
-// 只存放属性信息，实例对象在之后添加
 type Schema struct {
 	Model      interface{}
 	Name       string
 	Fields     []*Field
-	FieldNames []string // 单独提取列名，防止之后需要遍历对象
+	FieldNames []string // 单独提取列名，防止之后需要遍历fieldMap对象
 	fieldMap   map[string]*Field
 }
 
@@ -28,7 +27,7 @@ func (s *Schema) GetField(name string) *Field {
 	return s.fieldMap[name]
 }
 
-// 将任意对象解析为schema实例
+// Parse 将任意对象解析为schema实例
 func Parse(dest interface{}, d dialect.Dialect) *Schema {
 	modelType := reflect.Indirect(reflect.ValueOf(dest)).Type()
 	schema := &Schema{
@@ -53,4 +52,14 @@ func Parse(dest interface{}, d dialect.Dialect) *Schema {
 		}
 	}
 	return schema
+}
+
+// RecordValues 按名称平铺fields
+func (s *Schema) RecordValues(dest interface{}) []interface{} {
+	destValue := reflect.Indirect(reflect.ValueOf(dest))
+	var fieldValues []interface{}
+	for _, field := range s.Fields {
+		fieldValues = append(fieldValues, destValue.FieldByName(field.Name).Interface())
+	}
+	return fieldValues
 }
