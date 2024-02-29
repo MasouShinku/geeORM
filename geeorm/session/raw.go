@@ -6,6 +6,7 @@ package session
 
 import (
 	"database/sql"
+	"geeorm/clause"
 	"geeorm/dialect"
 	"geeorm/log"
 	"geeorm/schema"
@@ -19,6 +20,7 @@ type Session struct {
 	sqlVars  []interface{}   // 用于存储拼接sql语句时的占位符
 	dialect  dialect.Dialect // 存放数据库方言
 	refTable *schema.Schema  // 数据库模式
+	clause   clause.Clause   // sql子句
 }
 
 // New 创建会话对象
@@ -33,6 +35,7 @@ func New(db *sql.DB, dialect dialect.Dialect) *Session {
 func (s *Session) Clear() {
 	s.sql.Reset()
 	s.sqlVars = nil
+	s.clause = clause.Clause{}
 }
 
 // GetDB 获取DB对象
