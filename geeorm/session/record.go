@@ -21,6 +21,7 @@ func (s *Session) Insert(values ...interface{}) (int64, error) {
 	// 设置INSERT部分
 	recordValues := make([]interface{}, 0)
 	for _, value := range values {
+		s.CallMethod(BeforeInsert, value)
 		table := s.Model(value).RefTable()
 		s.clause.Set(clause.INSERT, table.Name, table.FieldNames)
 		recordValues = append(recordValues, table.RecordValues(value))
@@ -35,6 +36,7 @@ func (s *Session) Insert(values ...interface{}) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
+	s.CallMethod(AfterInsert, nil)
 	return result.RowsAffected()
 }
 
@@ -43,6 +45,7 @@ func (s *Session) Insert(values ...interface{}) (int64, error) {
 // var users []User
 // s.Find(&users)
 func (s *Session) Find(values interface{}) error {
+	s.CallMethod(BeforeQuery, nil)
 	destSlice := reflect.Indirect(reflect.ValueOf(values))
 
 	// 获取元素类型，并映射出表结构
@@ -67,6 +70,7 @@ func (s *Session) Find(values interface{}) error {
 		if err := rows.Scan(values...); err != nil {
 			return err
 		}
+		s.CallMethod(AfterQuery, dest.Addr().Interface())
 		destSlice.Set(reflect.Append(destSlice, dest))
 	}
 	return rows.Close()
@@ -76,6 +80,7 @@ func (s *Session) Find(values interface{}) error {
 // 支持入参1：map[string]any的键值对
 // 支持入参2：kv列表：key1,val1,kay2,val2,...
 func (s *Session) Update(kv ...interface{}) (int64, error) {
+	s.CallMethod(BeforeUpdate, nil)
 	m, ok := kv[0].(map[string]interface{})
 	// 若不是map形式，则对平铺kv列表进行转换
 	if !ok {
@@ -91,17 +96,20 @@ func (s *Session) Update(kv ...interface{}) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
+	s.CallMethod(AfterUpdate, nil)
 	return result.RowsAffected()
 }
 
 // Delete 删除语句
 func (s *Session) Delete() (int64, error) {
+	s.CallMethod(BeforeDelete, nil)
 	s.clause.Set(clause.DELETE, s.RefTable().Name)
 	sql, vars := s.clause.Build(clause.DELETE, clause.WHERE)
 	result, err := s.Raw(sql, vars...).Exec()
 	if err != nil {
 		return 0, err
 	}
+	s.CallMethod(AfterDelete, nil)
 	return result.RowsAffected()
 }
 
