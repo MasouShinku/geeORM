@@ -21,6 +21,7 @@ type Session struct {
 	dialect  dialect.Dialect // 存放数据库方言
 	refTable *schema.Schema  // 数据库模式
 	clause   clause.Clause   // sql子句
+	tx       *sql.Tx         // 事务锁
 }
 
 // New 创建会话对象
@@ -77,4 +78,18 @@ func (s *Session) QueryRows() (rows *sql.Rows, err error) {
 		log.Errorln(err)
 	}
 	return
+}
+
+// DB的func集合
+type CommonDB interface {
+	Query(query string, args ...interface{}) (*sql.Rows, error)
+	QueryRow(query string, args ...interface{}) *sql.Row
+	Exec(query string, args ...interface{}) (sql.Result, error)
+}
+
+func (s *Session) DB() CommonDB {
+	if s.tx != nil {
+		return s.tx
+	}
+	return s.db
 }
