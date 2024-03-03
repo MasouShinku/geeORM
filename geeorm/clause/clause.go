@@ -2,8 +2,6 @@
 package clause
 
 import (
-	"fmt"
-	"geeorm/log"
 	"strings"
 )
 
@@ -16,6 +14,9 @@ const (
 	LIMIT
 	WHERE
 	ORDERBY
+	UPDATE
+	DELETE
+	COUNT
 )
 
 type Clause struct {
@@ -32,7 +33,7 @@ func (c *Clause) Set(name Type, vars ...interface{}) {
 	sql, vars := generators[name](vars...)
 	c.sql[name] = sql
 	c.sqlVars[name] = vars
-	log.Infoln(fmt.Sprintf("there is vars after Set : [%s] %v", c.sql[name], c.sqlVars[name]))
+	//log.Infoln(fmt.Sprintf("there is vars after Set : [%s] %v", c.sql[name], c.sqlVars[name]))
 }
 
 // Build 生成sql语句
